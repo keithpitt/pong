@@ -1,8 +1,8 @@
 CC=g++
-CFLAGS=`sdl-config --cflags --libs`
+CFLAGS=`sdl-config --cflags --libs` -framework GLUT -framework OpenGL
 all: game
 clean:
-	rm -rf *.o
-	rm game
+	rm -rf build
 game:
-	$(CC) -o game main.cpp $(CFLAGS)
+	mkdir -p build
+	$(CC) -o build/game main.cpp $(CFLAGS)
