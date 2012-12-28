@@ -13,7 +13,7 @@ bundle: game
 	mkdir -p Pong/Contents/MacOS
 	mkdir -p Pong/Contents/Resources
 	cp build/game Pong/Contents/MacOS/Pong
-	iconutil -c icns -o Pong/Contents/Resources/Pong.icns resources/osx.iconset
+	iconutil -c icns -o Pong/Contents/Resources/Pong.icns assets/icon.iconset
 	cp Info.plist Pong/Contents
 	mv Pong Pong.app
 dist: bundle
