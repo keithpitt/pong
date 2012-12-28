@@ -52,11 +52,28 @@ int main(int argc, char** argv) {
     draw();
 
     while(SDL_PollEvent(&event)) {
-      debug("%i hello %s", event.type, "something");
+
+      // Handle OS quit events
       if(event.type == SDL_QUIT) {
         running = false;
         break;
       }
+
+      // Handle key presses
+      if(event.type == SDL_KEYDOWN) {
+        SDLKey key      = event.key.keysym.sym;
+        SDLMod modifier = event.key.keysym.mod;
+
+        // Handling CMD+Q for OSX
+        if((modifier & KMOD_META) && key == SDLK_q) {
+          running = false;
+          break;
+        }
+
+        // debug("%s key pressed.", SDL_GetKeyName(key));
+      }
+
+      // debug("unhandled event %i", event.type);
     }
 
     SDL_GL_SwapBuffers();
