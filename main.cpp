@@ -10,6 +10,13 @@
 #include <GL/glu.h>
 #endif
 
+// Stolen from:
+// http://stackoverflow.com/questions/1644868/c-define-macro-for-debug-printing
+#define DEBUG true
+#define debug(fmt, ...) \
+  if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt "\n", __FILE__, \
+      __LINE__, __func__, __VA_ARGS__);
+
 void init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glMatrixMode(GL_PROJECTION);
@@ -22,9 +29,9 @@ void draw() {
 
   glBegin(GL_QUADS);
     glVertex2f(0,0);
-    glVertex2f(250,0);
-    glVertex2f(250,250);
-    glVertex2f(0,250);
+    glVertex2f(100,0);
+    glVertex2f(100,100);
+    glVertex2f(0,100);
   glEnd();
 
   glFlush();
@@ -45,6 +52,7 @@ int main(int argc, char** argv) {
     draw();
 
     while(SDL_PollEvent(&event)) {
+      debug("%i hello %s", event.type, "something");
       if(event.type == SDL_QUIT) {
         running = false;
         break;
