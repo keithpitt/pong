@@ -4,5 +4,6 @@
 
 ```bash
 brew install sdl
+brew install box2d
 make
 ```
