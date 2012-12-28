@@ -70,6 +70,12 @@ int main(int argc, char** argv) {
           break;
         }
 
+        // Handle ALT-F4
+        if((modifier & KMOD_ALT) && key == SDLK_F4) {
+          running = false;
+          break;
+        }
+
         // debug("%s key pressed.", SDL_GetKeyName(key));
       }
 
