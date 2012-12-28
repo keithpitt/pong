@@ -17,6 +17,15 @@
   if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt "\n", __FILE__, \
       __LINE__, __func__, __VA_ARGS__);
 
+int x = 0;
+int y = 0;
+int speed = 10;
+
+int upVelocity = 0;
+int downVelocity = 0;
+int leftVelocity = 0;
+int rightVelocity = 0;
+
 void init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glMatrixMode(GL_PROJECTION);
@@ -28,10 +37,10 @@ void draw() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   glBegin(GL_QUADS);
-    glVertex2f(0,0);
-    glVertex2f(100,0);
-    glVertex2f(100,100);
-    glVertex2f(0,100);
+    glVertex2f(x,y);
+    glVertex2f(x + 100, y);
+    glVertex2f(x + 100, y +100);
+    glVertex2f(x,y + 100);
   glEnd();
 
   glFlush();
@@ -59,8 +68,9 @@ int main(int argc, char** argv) {
         break;
       }
 
-      // Handle key presses
+      // Handle key down events
       if(event.type == SDL_KEYDOWN) {
+        // debug("%s key pressed.", SDL_GetKeyName(key));
         SDLKey key      = event.key.keysym.sym;
         SDLMod modifier = event.key.keysym.mod;
 
@@ -76,11 +86,44 @@ int main(int argc, char** argv) {
           break;
         }
 
-        // debug("%s key pressed.", SDL_GetKeyName(key));
+        if(key == SDLK_DOWN) {
+          downVelocity = speed;
+          break;
+        } else if (key == SDLK_UP) {
+          upVelocity = speed * -1;
+          break;
+        } else if (key == SDLK_LEFT) {
+          leftVelocity = speed * -1;
+          break;
+        } else if (key == SDLK_RIGHT) {
+          rightVelocity = speed;
+          break;
+        }
+      }
+
+      if(event.type == SDL_KEYUP) {
+        SDLKey key      = event.key.keysym.sym;
+
+        if(key == SDLK_DOWN) {
+          downVelocity = 0;
+          break;
+        } else if (key == SDLK_UP) {
+          upVelocity = 0;
+          break;
+        } else if (key == SDLK_LEFT) {
+          leftVelocity = 0;
+          break;
+        } else if (key == SDLK_RIGHT) {
+          rightVelocity = 0;
+          break;
+        }
       }
 
       // debug("unhandled event %i", event.type);
     }
+
+    x += leftVelocity + rightVelocity;
+    y += upVelocity + downVelocity;
 
     SDL_GL_SwapBuffers();
   }
