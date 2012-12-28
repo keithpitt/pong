@@ -19,8 +19,9 @@ bundle: pong
 	mv $(NAME) $(NAME).app
 dist: bundle
 	cp -R $(NAME).app ~/Dropbox/Games/
-main:
+prepare:
+	mkdir -p $(DIR)
+main: prepare
 	$(CC) -c main.cpp -o $(DIR)/main.o
 pong: main
-	mkdir -p $(DIR)
 	$(CC) -o $(DIR)/pong $(DIR)/main.o $(CFLAGS)
