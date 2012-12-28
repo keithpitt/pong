@@ -23,13 +23,25 @@ namespace Direction {
   };
 };
 
+class Rectangle {
+  public:
+  int x, y, width, height;
+
+  Rectangle(int _x, int _y, int w, int h) {
+    x      = _x;
+    y      = _y;
+    width  = w;
+    height = h;
+  };
+};
+
 class Entity {
   int upVelocity, downVelocity, leftVelocity, rightVelocity;
 
   public:
 
-  int x, y, w, h;
-  int speed;
+  int       x, y, w, h;
+  int       speed;
 
   void init(int xx, int yy) {
     x = xx;
@@ -69,16 +81,63 @@ class Entity {
 
   void render() {
     glBegin(GL_QUADS);
-      glVertex2f(x,y);
-      glVertex2f(x + w, y);
-      glVertex2f(x + w, y + h);
-      glVertex2f(x, y + h);
+    glVertex2f(x, y);
+    glVertex2f(x + w, y);
+    glVertex2f(x + w, y + h);
+    glVertex2f(x, y + h);
     glEnd();
   }
 
   void update() {
     x += leftVelocity + rightVelocity;
     y += upVelocity + downVelocity;
+  }
+};
+
+class Player {
+  SDLKey upKey, downKey, leftKey, rightKey;
+
+  public:
+
+  Entity entity;
+
+  void init(SDLKey up, SDLKey down, SDLKey left, SDLKey right) {
+    upKey    = up;
+    downKey  = down;
+    leftKey  = left;
+    rightKey = right;
+  }
+
+  void update() {
+    entity.update();
+  }
+
+  void render() {
+    entity.render();
+  }
+
+  void keyDown(SDLKey key) {
+    if(key == downKey) {
+      entity.travel(Direction::DOWN);
+    } else if (key == upKey) {
+      entity.travel(Direction::UP);
+    } else if (key == leftKey) {
+      entity.travel(Direction::LEFT);
+    } else if (key == rightKey) {
+      entity.travel(Direction::RIGHT);
+    }
+  }
+
+  void keyUp(SDLKey key) {
+    if(key == downKey) {
+      entity.stop(Direction::DOWN);
+    } else if (key == upKey) {
+      entity.stop(Direction::UP);
+    } else if (key == leftKey) {
+      entity.stop(Direction::LEFT);
+    } else if (key == rightKey) {
+      entity.stop(Direction::RIGHT);
+    }
   }
 };
 
@@ -99,11 +158,14 @@ int main(int argc, char** argv) {
 
   init();
 
-  Entity player;
-  player.init(80, 280);
+  Player player;
+  player.init(SDLK_w, SDLK_s, SDLK_a, SDLK_d);
+  player.entity.init(80, 280);
+  // player.entity.bounds = new Rectangle(1, 2, 3, 4);
 
-  Entity player2;
-  player2.init(1130, 280);
+  Player player2;
+  player2.init(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT);
+  player2.entity.init(1130, 280);
 
   while(running) {
     start = SDL_GetTicks();
@@ -139,65 +201,15 @@ int main(int argc, char** argv) {
           break;
         }
 
-        if(key == SDLK_DOWN) {
-          player.travel(Direction::DOWN);
-          break;
-        } else if (key == SDLK_UP) {
-          player.travel(Direction::UP);
-          break;
-        } else if (key == SDLK_LEFT) {
-          player.travel(Direction::LEFT);
-          break;
-        } else if (key == SDLK_RIGHT) {
-          player.travel(Direction::RIGHT);
-          break;
-        }
-
-        if(key == SDLK_s) {
-          player2.travel(Direction::DOWN);
-          break;
-        } else if (key == SDLK_w) {
-          player2.travel(Direction::UP);
-          break;
-        } else if (key == SDLK_a) {
-          player2.travel(Direction::LEFT);
-          break;
-        } else if (key == SDLK_d) {
-          player2.travel(Direction::RIGHT);
-          break;
-        }
+        player.keyDown(key);
+        player2.keyDown(key);
       }
 
       if(event.type == SDL_KEYUP) {
         SDLKey key = event.key.keysym.sym;
 
-        if(key == SDLK_DOWN) {
-          player.stop(Direction::DOWN);
-          break;
-        } else if (key == SDLK_UP) {
-          player.stop(Direction::UP);
-          break;
-        } else if (key == SDLK_LEFT) {
-          player.stop(Direction::LEFT);
-          break;
-        } else if (key == SDLK_RIGHT) {
-          player.stop(Direction::RIGHT);
-          break;
-        }
-
-        if(key == SDLK_s) {
-          player2.stop(Direction::DOWN);
-          break;
-        } else if (key == SDLK_w) {
-          player2.stop(Direction::UP);
-          break;
-        } else if (key == SDLK_a) {
-          player2.stop(Direction::LEFT);
-          break;
-        } else if (key == SDLK_d) {
-          player2.stop(Direction::RIGHT);
-          break;
-        }
+        player.keyUp(key);
+        player2.keyUp(key);
       }
 
       // debug("unhandled event %i", event.type);
