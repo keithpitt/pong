@@ -1,25 +1,26 @@
 CC=g++
 CFLAGS=`sdl-config --cflags --static-libs` -framework GLUT -framework OpenGL
-OBJECTS=main.o
-all: game
+DIR=build
+NAME=Pong
+all: pong
 clean:
-	rm -rf build
-	rm -rf Pong.app
-	rm -rf Pong.zip
-test: game
-	./build/game
-bundle: game
-	rm -rf Pong.app
-	mkdir -p Pong/Contents/MacOS
-	mkdir -p Pong/Contents/Resources
-	cp build/game Pong/Contents/MacOS/Pong
-	iconutil -c icns -o Pong/Contents/Resources/Pong.icns assets/icon.iconset
-	cp Info.plist Pong/Contents
-	mv Pong Pong.app
+	rm -rf $(DIR)
+	rm -rf $(NAME).app
+	rm -rf $(NAME).zip
+test: pong
+	./$(DIR)/pong
+bundle: pong
+	rm -rf $(NAME).app
+	mkdir -p $(NAME)/Contents/MacOS
+	mkdir -p $(NAME)/Contents/Resources
+	cp $(DIR)/pong $(NAME)/Contents/MacOS/$(NAME)
+	iconutil -c icns -o $(NAME)/Contents/Resources/$(NAME).icns assets/icon.iconset
+	cp Info.plist $(NAME)/Contents
+	mv $(NAME) $(NAME).app
 dist: bundle
-	cp -R Pong.app ~/Dropbox/Games/
-.cpp.o:
-	$(CC) -Wall -c -o $@ $<
-game: $(OBJECTS)
-	mkdir -p build
-	$(CC) -o build/game $(OBJECTS) $(CFLAGS)
+	cp -R $(NAME).app ~/Dropbox/Games/
+main:
+	$(CC) -c main.cpp -o $(DIR)/main.o
+pong: main
+	mkdir -p $(DIR)
+	$(CC) -o $(DIR)/pong $(DIR)/main.o $(CFLAGS)
