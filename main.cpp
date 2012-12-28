@@ -17,14 +17,70 @@
   if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt "\n", __FILE__, \
       __LINE__, __func__, __VA_ARGS__);
 
-int x = 0;
-int y = 0;
-int speed = 10;
+namespace Direction {
+  enum type {
+    UP, DOWN, LEFT, RIGHT
+  };
+};
 
-int upVelocity = 0;
-int downVelocity = 0;
-int leftVelocity = 0;
-int rightVelocity = 0;
+class Entity {
+  int upVelocity, downVelocity, leftVelocity, rightVelocity;
+
+  public:
+
+  int x, y, w, h;
+  int speed;
+
+  void init(int xx, int yy) {
+    x = xx;
+    y = yy;
+    w = 70;
+    h = 200;
+    speed = 10;
+    upVelocity    = 0;
+    downVelocity  = 0;
+    leftVelocity  = 0;
+    rightVelocity = 0;
+  }
+
+  void travel(Direction::type direction) {
+    if(direction == Direction::DOWN) {
+      downVelocity = speed;
+    } else if (direction == Direction::UP) {
+      upVelocity = speed * -1;
+    } else if (direction == Direction::LEFT) {
+      leftVelocity = speed * -1;
+    } else if (direction == Direction::RIGHT) {
+      rightVelocity = speed;
+    }
+  }
+
+  void stop(Direction::type direction) {
+    if(direction == Direction::DOWN) {
+      downVelocity = 0;
+    } else if (direction == Direction::UP) {
+      upVelocity = 0;
+    } else if (direction == Direction::LEFT) {
+      leftVelocity = 0;
+    } else if (direction == Direction::RIGHT) {
+      rightVelocity = 0;
+    }
+  }
+
+  void render() {
+    glBegin(GL_QUADS);
+      glVertex2f(x,y);
+      glVertex2f(x + w, y);
+      glVertex2f(x + w, y + h);
+      glVertex2f(x, y + h);
+    glEnd();
+  }
+
+  void update() {
+    x += leftVelocity + rightVelocity;
+    y += upVelocity + downVelocity;
+  }
+};
 
 void init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -32,19 +88,6 @@ void init() {
   glLoadIdentity();
   glOrtho(0.0, 1280, 720, 1.0, -1.0, 1.0);
 }
-
-void draw() {
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  glBegin(GL_QUADS);
-    glVertex2f(x,y);
-    glVertex2f(x + 100, y);
-    glVertex2f(x + 100, y +100);
-    glVertex2f(x,y + 100);
-  glEnd();
-
-  glFlush();
-};
 
 int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_EVERYTHING);
@@ -56,9 +99,19 @@ int main(int argc, char** argv) {
 
   init();
 
+  Entity player;
+  player.init(80, 280);
+
+  Entity player2;
+  player2.init(1130, 280);
+
   while(running) {
     start = SDL_GetTicks();
-    draw();
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    player.render();
+    player2.render();
+    glFlush();
 
     while(SDL_PollEvent(&event)) {
 
@@ -87,34 +140,62 @@ int main(int argc, char** argv) {
         }
 
         if(key == SDLK_DOWN) {
-          downVelocity = speed;
+          player.travel(Direction::DOWN);
           break;
         } else if (key == SDLK_UP) {
-          upVelocity = speed * -1;
+          player.travel(Direction::UP);
           break;
         } else if (key == SDLK_LEFT) {
-          leftVelocity = speed * -1;
+          player.travel(Direction::LEFT);
           break;
         } else if (key == SDLK_RIGHT) {
-          rightVelocity = speed;
+          player.travel(Direction::RIGHT);
+          break;
+        }
+
+        if(key == SDLK_s) {
+          player2.travel(Direction::DOWN);
+          break;
+        } else if (key == SDLK_w) {
+          player2.travel(Direction::UP);
+          break;
+        } else if (key == SDLK_a) {
+          player2.travel(Direction::LEFT);
+          break;
+        } else if (key == SDLK_d) {
+          player2.travel(Direction::RIGHT);
           break;
         }
       }
 
       if(event.type == SDL_KEYUP) {
-        SDLKey key      = event.key.keysym.sym;
+        SDLKey key = event.key.keysym.sym;
 
         if(key == SDLK_DOWN) {
-          downVelocity = 0;
+          player.stop(Direction::DOWN);
           break;
         } else if (key == SDLK_UP) {
-          upVelocity = 0;
+          player.stop(Direction::UP);
           break;
         } else if (key == SDLK_LEFT) {
-          leftVelocity = 0;
+          player.stop(Direction::LEFT);
           break;
         } else if (key == SDLK_RIGHT) {
-          rightVelocity = 0;
+          player.stop(Direction::RIGHT);
+          break;
+        }
+
+        if(key == SDLK_s) {
+          player2.stop(Direction::DOWN);
+          break;
+        } else if (key == SDLK_w) {
+          player2.stop(Direction::UP);
+          break;
+        } else if (key == SDLK_a) {
+          player2.stop(Direction::LEFT);
+          break;
+        } else if (key == SDLK_d) {
+          player2.stop(Direction::RIGHT);
           break;
         }
       }
@@ -122,8 +203,8 @@ int main(int argc, char** argv) {
       // debug("unhandled event %i", event.type);
     }
 
-    x += leftVelocity + rightVelocity;
-    y += upVelocity + downVelocity;
+    player.update();
+    player2.update();
 
     SDL_GL_SwapBuffers();
   }
