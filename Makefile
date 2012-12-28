@@ -22,6 +22,6 @@ dist: bundle
 prepare:
 	mkdir -p $(DIR)
 main: prepare
-	$(CC) -c main.cpp -o $(DIR)/main.o
+	$(CC) -Wall -c main.cpp -o $(DIR)/main.o
 pong: main
-	$(CC) -o $(DIR)/pong $(DIR)/main.o $(CFLAGS)
+	$(CC) -Wall -o $(DIR)/pong $(DIR)/main.o $(CFLAGS)
