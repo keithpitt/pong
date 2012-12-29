@@ -35,7 +35,7 @@ class Rectangle {
   };
 };
 
-class Entity {
+class Box {
   int upVelocity, downVelocity, leftVelocity, rightVelocity;
 
   public:
@@ -115,7 +115,7 @@ class Player {
 
   public:
 
-  Entity entity;
+  Box box;
 
   void init(SDLKey up, SDLKey down, SDLKey left, SDLKey right) {
     upKey    = up;
@@ -125,34 +125,34 @@ class Player {
   }
 
   void update() {
-    entity.update();
+    box.update();
   }
 
   void render() {
-    entity.render();
+    box.render();
   }
 
   void keyDown(SDLKey key) {
     if(key == downKey) {
-      entity.travel(Direction::DOWN);
+      box.travel(Direction::DOWN);
     } else if (key == upKey) {
-      entity.travel(Direction::UP);
+      box.travel(Direction::UP);
     } else if (key == leftKey) {
-      entity.travel(Direction::LEFT);
+      box.travel(Direction::LEFT);
     } else if (key == rightKey) {
-      entity.travel(Direction::RIGHT);
+      box.travel(Direction::RIGHT);
     }
   }
 
   void keyUp(SDLKey key) {
     if(key == downKey) {
-      entity.stop(Direction::DOWN);
+      box.stop(Direction::DOWN);
     } else if (key == upKey) {
-      entity.stop(Direction::UP);
+      box.stop(Direction::UP);
     } else if (key == leftKey) {
-      entity.stop(Direction::LEFT);
+      box.stop(Direction::LEFT);
     } else if (key == rightKey) {
-      entity.stop(Direction::RIGHT);
+      box.stop(Direction::RIGHT);
     }
   }
 };
@@ -165,7 +165,7 @@ class Ball {
 
   public:
 
-  Entity entity;
+  Box box;
 
   void init() {
     angle = 45;
@@ -176,43 +176,43 @@ class Ball {
   }
 
   void update(Player player1, Player player2) {
-    int xx = entity.x + xVelocity;
-    int yy = entity.y + yVelocity;
+    int xx = box.x + xVelocity;
+    int yy = box.y + yVelocity;
 
-    if(xx < entity.bounds.x1) {
-      xx = entity.bounds.x1;
+    if(xx < box.bounds.x1) {
+      xx = box.bounds.x1;
       xVelocity = xVelocity * -1;
-    } else if (xx > (entity.bounds.x2 - entity.w)) {
-      xx = entity.bounds.x2 - entity.w;
+    } else if (xx > (box.bounds.x2 - box.w)) {
+      xx = box.bounds.x2 - box.w;
       xVelocity = xVelocity * -1;
     }
 
-    if(yy < entity.bounds.y1) {
-      yy = entity.bounds.y1;
+    if(yy < box.bounds.y1) {
+      yy = box.bounds.y1;
       yVelocity = yVelocity * -1;
-    } else if (yy > (entity.bounds.y2 - entity.h)) {
-      yy = (entity.bounds.y2 - entity.h);
+    } else if (yy > (box.bounds.y2 - box.h)) {
+      yy = (box.bounds.y2 - box.h);
       yVelocity = yVelocity * -1;
     }
 
-    if(xx <= (player1.entity.x + player1.entity.w)) {
-      if((yy + entity.h) > player1.entity.y && yy < (player1.entity.y + player1.entity.h)) {
+    if(xx <= (player1.box.x + player1.box.w)) {
+      if((yy + box.h) > player1.box.y && yy < (player1.box.y + player1.box.h)) {
         xVelocity = xVelocity * -1;
       }
     }
 
-    if((xx + entity.w) >= (player2.entity.x)) {
-      if((yy + entity.h) > player2.entity.y && yy < (player2.entity.y + player2.entity.h)) {
+    if((xx + box.w) >= (player2.box.x)) {
+      if((yy + box.h) > player2.box.y && yy < (player2.box.y + player2.box.h)) {
         xVelocity = xVelocity * -1;
       }
     }
 
-    entity.x = xx + xVelocity;
-    entity.y = yy + yVelocity;
+    box.x = xx + xVelocity;
+    box.y = yy + yVelocity;
   }
 
   void render() {
-    entity.render();
+    box.render();
   }
 };
 
@@ -235,18 +235,18 @@ int main(int argc, char** argv) {
 
   Player player;
   player.init(SDLK_w, SDLK_s, SDLK_a, SDLK_d);
-  player.entity.init(80, 280);
-  player.entity.bounds.init(player.entity.x, 0, player.entity.x + player.entity.w, 720);
+  player.box.init(80, 280);
+  player.box.bounds.init(player.box.x, 0, player.box.x + player.box.w, 720);
 
   Player player2;
   player2.init(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT);
-  player2.entity.init(1130, 280);
-  player2.entity.bounds.init(player2.entity.x, 0, player2.entity.x + player2.entity.w, 720);
+  player2.box.init(1130, 280);
+  player2.box.bounds.init(player2.box.x, 0, player2.box.x + player2.box.w, 720);
 
   Ball ball;
   ball.init();
-  ball.entity.init(300, 300, 30, 30);
-  ball.entity.bounds.init(0, 0, 1280, 720);
+  ball.box.init(300, 300, 30, 30);
+  ball.box.bounds.init(0, 0, 1280, 720);
 
   while(running) {
     start = SDL_GetTicks();
