@@ -44,11 +44,11 @@ class Entity {
   int       speed;
   Rectangle bounds;
 
-  void init(int xx, int yy) {
+  void init(int xx, int yy, int ww = 30, int hh = 200) {
     x = xx;
     y = yy;
-    w = 70;
-    h = 200;
+    w = ww;
+    h = hh;
     speed = 10;
     upVelocity    = 0;
     downVelocity  = 0;
@@ -157,6 +157,65 @@ class Player {
   }
 };
 
+class Ball {
+  int angle;
+  int speed;
+  int xVelocity;
+  int yVelocity;
+
+  public:
+
+  Entity entity;
+
+  void init() {
+    angle = 45;
+    speed = 4;
+
+    xVelocity = speed;
+    yVelocity = speed;
+  }
+
+  void update(Player player1, Player player2) {
+    int xx = entity.x + xVelocity;
+    int yy = entity.y + yVelocity;
+
+    if(xx < entity.bounds.x1) {
+      xx = entity.bounds.x1;
+      xVelocity = xVelocity * -1;
+    } else if (xx > (entity.bounds.x2 - entity.w)) {
+      xx = entity.bounds.x2 - entity.w;
+      xVelocity = xVelocity * -1;
+    }
+
+    if(yy < entity.bounds.y1) {
+      yy = entity.bounds.y1;
+      yVelocity = yVelocity * -1;
+    } else if (yy > (entity.bounds.y2 - entity.h)) {
+      yy = (entity.bounds.y2 - entity.h);
+      yVelocity = yVelocity * -1;
+    }
+
+    if(xx <= (player1.entity.x + player1.entity.w)) {
+      if((yy + entity.h) > player1.entity.y && yy < (player1.entity.y + player1.entity.h)) {
+        xVelocity = xVelocity * -1;
+      }
+    }
+
+    if((xx + entity.w) >= (player2.entity.x)) {
+      if((yy + entity.h) > player2.entity.y && yy < (player2.entity.y + player2.entity.h)) {
+        xVelocity = xVelocity * -1;
+      }
+    }
+
+    entity.x = xx + xVelocity;
+    entity.y = yy + yVelocity;
+  }
+
+  void render() {
+    entity.render();
+  }
+};
+
 void init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glMatrixMode(GL_PROJECTION);
@@ -184,12 +243,18 @@ int main(int argc, char** argv) {
   player2.entity.init(1130, 280);
   player2.entity.bounds.init(player2.entity.x, 0, player2.entity.x + player2.entity.w, 720);
 
+  Ball ball;
+  ball.init();
+  ball.entity.init(300, 300, 30, 30);
+  ball.entity.bounds.init(0, 0, 1280, 720);
+
   while(running) {
     start = SDL_GetTicks();
 
     glClear(GL_COLOR_BUFFER_BIT);
     player.render();
     player2.render();
+    ball.render();
     glFlush();
 
     while(SDL_PollEvent(&event)) {
@@ -234,6 +299,7 @@ int main(int argc, char** argv) {
 
     player.update();
     player2.update();
+    ball.update(player, player2);
 
     SDL_GL_SwapBuffers();
   }
