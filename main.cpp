@@ -167,12 +167,10 @@ int main(int argc, char** argv) {
   Player player;
   player.init(SDLK_w, SDLK_s);
   player.box.init(80, 280);
-  // player.box.bounds.init(player.box.x, 0, player.box.x + player.box.w, 720);
 
   Player player2;
   player2.init(SDLK_UP, SDLK_DOWN);
   player2.box.init(1130, 280);
-  // player2.box.bounds.init(player2.box.x, 0, player2.box.x + player2.box.w, 720);
 
   Ball ball;
   ball.init();
