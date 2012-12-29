@@ -17,6 +17,8 @@
   if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt "\n", __FILE__, \
       __LINE__, __func__, __VA_ARGS__);
 
+const int FPS=60;
+
 namespace Direction {
   enum type {
     UP, DOWN, LEFT, RIGHT
@@ -302,6 +304,10 @@ int main(int argc, char** argv) {
     ball.update(player, player2);
 
     SDL_GL_SwapBuffers();
+
+    int offset = SDL_GetTicks() - start;
+    if((1000 / FPS) > offset)
+      SDL_Delay((1000 / FPS) - offset);
   }
 
   return 0;
