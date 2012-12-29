@@ -25,13 +25,13 @@ namespace Direction {
 
 class Rectangle {
   public:
-  int x, y, width, height;
+  int x1, y1, x2, y2;
 
-  Rectangle(int _x, int _y, int w, int h) {
-    x      = _x;
-    y      = _y;
-    width  = w;
-    height = h;
+  void init(int _x1, int _y1, int _x2, int _y2) {
+    x1 = _x1;
+    y1 = _y1;
+    x2 = _x2;
+    y2 = _y2;
   };
 };
 
@@ -42,6 +42,7 @@ class Entity {
 
   int       x, y, w, h;
   int       speed;
+  Rectangle bounds;
 
   void init(int xx, int yy) {
     x = xx;
@@ -89,8 +90,23 @@ class Entity {
   }
 
   void update() {
-    x += leftVelocity + rightVelocity;
-    y += upVelocity + downVelocity;
+    int xx = x + (leftVelocity + rightVelocity);
+    int yy = y + (upVelocity + downVelocity);
+
+    if(xx < bounds.x1) {
+      xx = bounds.x1;
+    } else if (xx > (bounds.x2 - w)) {
+      xx = bounds.x2 - w;
+    }
+
+    if(yy < bounds.y1) {
+      yy = bounds.y1;
+    } else if (yy > (bounds.y2 - h)) {
+      yy = (bounds.y2 - h);
+    }
+
+    x = xx;
+    y = yy;
   }
 };
 
@@ -161,11 +177,12 @@ int main(int argc, char** argv) {
   Player player;
   player.init(SDLK_w, SDLK_s, SDLK_a, SDLK_d);
   player.entity.init(80, 280);
-  // player.entity.bounds = new Rectangle(1, 2, 3, 4);
+  player.entity.bounds.init(player.entity.x, 0, player.entity.x + player.entity.w, 720);
 
   Player player2;
   player2.init(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT);
   player2.entity.init(1130, 280);
+  player2.entity.bounds.init(player2.entity.x, 0, player2.entity.x + player2.entity.w, 720);
 
   while(running) {
     start = SDL_GetTicks();
