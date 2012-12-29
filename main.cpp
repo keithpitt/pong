@@ -18,6 +18,8 @@
       __LINE__, __func__, __VA_ARGS__);
 
 const int FPS=60;
+const int WIDTH=1280;
+const int HEIGHT=720;
 
 namespace Direction {
   enum type {
@@ -151,12 +153,12 @@ void init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(0.0, 1280, 720, 1.0, -1.0, 1.0);
+  glOrtho(0.0, WIDTH, HEIGHT, 1.0, -1.0, 1.0);
 }
 
 int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_EVERYTHING);
-  SDL_Surface * screen = SDL_SetVideoMode(1280, 720, 32, SDL_SWSURFACE|SDL_OPENGL);
+  SDL_Surface * screen = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_SWSURFACE|SDL_OPENGL);
 
   bool running = true;
   uint32_t start;
@@ -175,13 +177,13 @@ int main(int argc, char** argv) {
   Ball ball;
   ball.init();
   ball.box.init(300, 300, 30, 30);
-  // ball.box.bounds.init(0, 0, 1280, 720);
+  // ball.box.bounds.init(0, 0, WIDTH, HEIGHT);
 
   // Bounds
-  Box top; top.init(0, 0, 1280, 0);
-  Box bottom; bottom.init(0, 718, 1280, 0);
-  Box left; left.init(0, 0, 1280, 0);
-  Box right; right.init(1280, 0, 720, 0);
+  Box top; top.init(0, 0, WIDTH, 0);
+  Box bottom; bottom.init(0, 718, WIDTH, 0);
+  Box left; left.init(0, 0, WIDTH, 0);
+  Box right; right.init(WIDTH, 0, HEIGHT, 0);
 
   while(running) {
     start = SDL_GetTicks();
