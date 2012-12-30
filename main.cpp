@@ -17,22 +17,43 @@
   if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt "\n", __FILE__, \
       __LINE__, __func__, __VA_ARGS__);
 
-const int FPS=60;
-const int WIDTH=1280;
-const int HEIGHT=720;
+const int FPS    = 60;
+const int WIDTH  = 1280;
+const int HEIGHT = 720;
+
+const int BLOCK  = 25;
+const int TOP    = 0 + BLOCK;
+const int BOTTOM = HEIGHT - BLOCK;
 
 namespace Direction {
   enum type {
-    UP, DOWN, LEFT, RIGHT
+    UP, DOWN
   };
 };
+
+void drawDottedLine() {
+  int blocks  = (BOTTOM - TOP + BLOCK) / (BLOCK * 2);
+  int left    = WIDTH / 2 - BLOCK;
+  int padding = BLOCK;
+
+  for(int i = 0; i < blocks; i++) {
+    int top = (TOP + BLOCK) + (i * BLOCK) + (padding * i);
+
+    glBegin(GL_QUADS);
+    glVertex2f(left, top);
+    glVertex2f(left + BLOCK, top);
+    glVertex2f(left + BLOCK, top + BLOCK);
+    glVertex2f(left, top + BLOCK);
+    glEnd();
+  }
+}
 
 class Box {
   public:
 
   int x, y, w, h;
 
-  void init(int xx, int yy, int ww = 30, int hh = 200) {
+  void init(int xx, int yy, int ww = BLOCK, int hh = BLOCK*7) {
     x = xx;
     y = yy;
     w = ww;
@@ -70,10 +91,11 @@ class Player {
 
   void update(Box top, Box bottom) {
     int yy = box.y + (upVelocity + downVelocity);
+    int topY = top.y + top.h;
     int bottomY = bottom.y - box.h;
 
-    if(yy <= top.y)
-      yy = top.y;
+    if(yy <= topY)
+      yy = topY;
     else if(yy >= bottomY)
       yy = bottomY;
 
@@ -176,12 +198,12 @@ int main(int argc, char** argv) {
 
   Ball ball;
   ball.init();
-  ball.box.init(300, 300, 30, 30);
+  ball.box.init(WIDTH/2-BLOCK, HEIGHT/2-BLOCK, BLOCK, BLOCK);
   // ball.box.bounds.init(0, 0, WIDTH, HEIGHT);
 
   // Bounds
-  Box top; top.init(0, 0, WIDTH, 0);
-  Box bottom; bottom.init(0, 718, WIDTH, 0);
+  Box top; top.init(0, TOP, WIDTH, BLOCK);
+  Box bottom; bottom.init(0, BOTTOM-BLOCK, WIDTH, BLOCK);
   Box left; left.init(0, 0, WIDTH, 0);
   Box right; right.init(WIDTH, 0, HEIGHT, 0);
 
@@ -191,7 +213,10 @@ int main(int argc, char** argv) {
     glClear(GL_COLOR_BUFFER_BIT);
     player.render();
     player2.render();
+    top.render();
+    bottom.render();
     ball.render();
+    drawDottedLine();
     glFlush();
 
     while(SDL_PollEvent(&event)) {
