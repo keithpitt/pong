@@ -1,6 +1,10 @@
 #include <iostream>
 #include <SDL/SDL.h>
+#include <FTGL/ftgl.h>
 #include <stdint.h>
+
+#include <sstream>  //include this to use string streams
+#include <string>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -25,6 +29,11 @@ const int BLOCK  = 25;
 const int TOP    = 0 + BLOCK;
 const int BOTTOM = HEIGHT - BLOCK;
 
+int PLAYER1SCORE=0;
+int PLAYER2SCORE=0;
+
+FTFont* font;
+
 namespace Direction {
   enum type {
     UP, DOWN
@@ -45,6 +54,31 @@ void drawDottedLine() {
     glVertex2f(left, top + BLOCK);
     glEnd();
   }
+}
+
+const char* formatScore(int score) {
+  std::ostringstream ostr; //output string stream
+
+  //use the string stream just like cout,
+  //except the stream prints not to stdout but to a string.
+  ostr << score;
+
+  return ostr.str().c_str();
+};
+
+void drawScores() {
+  glPushMatrix();
+
+  glMatrixMode(GL_PROJECTION);
+  glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
+  FTPoint player1ScorePoint = FTPoint(540, 600, -1);
+  font->Render(formatScore(PLAYER1SCORE), -1, player1ScorePoint);
+
+  FTPoint player2ScorePoint = FTPoint(670, 600, -1);
+  font->Render(formatScore(PLAYER2SCORE), -1, player2ScorePoint);
+
+  glPopMatrix();
 }
 
 class Box {
@@ -206,10 +240,12 @@ class Ball {
     }
 
     if(box.collision(left)) {
+      PLAYER2SCORE += 1;
       reset();
     }
 
     if(box.collision(right)) {
+      PLAYER1SCORE += 1;
       reset();
     }
 
@@ -231,7 +267,15 @@ void init() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(0.0, WIDTH, HEIGHT, 1.0, -1.0, 1.0);
+  glOrtho(0.0, WIDTH, HEIGHT, 0.0, -1.0, 1.0);
+
+  font = new FTGLPixmapFont("/Library/Fonts/Courier New Bold.ttf");
+  font->FaceSize(72);
+
+  if(font->Error()) {
+    fprintf(stderr, "Failed to open font\n");
+    exit(1);
+  }
 }
 
 int main(int argc, char** argv) {
@@ -271,6 +315,7 @@ int main(int argc, char** argv) {
     bottom.render();
     ball.render();
     drawDottedLine();
+    drawScores();
     glFlush();
 
     while(SDL_PollEvent(&event)) {

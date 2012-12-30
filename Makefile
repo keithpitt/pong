@@ -1,5 +1,7 @@
 CC=g++
-CFLAGS=`sdl-config --cflags --static-libs` -framework GLUT -framework OpenGL
+CPPFLAGS=`pkg-config freetype2 --libs --static --cflags` \
+				 `pkg-config ftgl --libs --static --cflags` \
+				 `sdl-config --static-libs --cflags`
 DIR=build
 NAME=Pong
 all: pong
@@ -19,9 +21,6 @@ bundle: pong
 	mv $(NAME) $(NAME).app
 dist: bundle
 	cp -R $(NAME).app ~/Dropbox/Games/
-prepare:
+pong:
 	mkdir -p $(DIR)
-main: prepare
-	$(CC) -Wall -c main.cpp -o $(DIR)/main.o
-pong: main
-	$(CC) -Wall -o $(DIR)/pong $(DIR)/main.o $(CFLAGS)
+	$(CC) -Wall -o $(DIR)/pong main.cpp $(CPPFLAGS)
