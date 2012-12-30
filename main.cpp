@@ -34,10 +34,9 @@ namespace Direction {
 void drawDottedLine() {
   int blocks  = (BOTTOM - TOP + BLOCK) / (BLOCK * 2);
   int left    = WIDTH / 2 - BLOCK;
-  int padding = BLOCK;
 
   for(int i = 0; i < blocks; i++) {
-    int top = (TOP + BLOCK) + (i * BLOCK) + (padding * i);
+    int top = (TOP + BLOCK) + ((i * BLOCK) * 2);
 
     glBegin(GL_QUADS);
     glVertex2f(left, top);
