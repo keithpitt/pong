@@ -59,6 +59,29 @@ class Box {
     h = hh;
   }
 
+  int left() {
+    return x;
+  }
+
+  int top() {
+    return y;
+  }
+
+  int bottom() {
+    return y + h;
+  }
+
+  int right() {
+    return x + w;
+  }
+
+  bool collision(Box box) {
+    return !(box.left() > right()
+        || box.right() < left()
+        || box.top() > bottom()
+        || box.bottom() < top());
+  }
+
   void render() {
     glBegin(GL_QUADS);
     glVertex2f(x, y);
@@ -139,30 +162,64 @@ class Player {
 };
 
 class Ball {
-  int angle;
   int speed;
   int xVelocity;
   int yVelocity;
+
+  int startX;
+  int startY;
 
   public:
 
   Box box;
 
   void init() {
-    angle = 45;
-    speed = 4;
-
+    startX = WIDTH/2-BLOCK;
+    startY = HEIGHT/2-BLOCK;
+    speed = 6;
     xVelocity = speed;
-    yVelocity = speed;
+    yVelocity = speed * -1;
+
+    box.init(0, 0, BLOCK, BLOCK);
+    reset();
   }
 
-  void update(Player player1, Player player2) {
-    int xx = box.x + xVelocity;
-    int yy = box.y + yVelocity;
+  void update(Player player1, Player player2, Box top, Box bottom, Box left, Box right) {
+    if(box.collision(bottom)) {
+      box.y = bottom.top() - box.h;
+      yVelocity = yVelocity * -1;
+    }
 
+    if(box.collision(top)) {
+      box.y = top.bottom();
+      yVelocity = yVelocity * -1;
+    }
 
-    box.x = xx + xVelocity;
-    box.y = yy + yVelocity;
+    if(box.collision(player1.box)) {
+      box.x = player1.box.right();
+      xVelocity = xVelocity * -1;
+    }
+
+    if(box.collision(player2.box)) {
+      box.x = player2.box.left() - box.w;
+      xVelocity = xVelocity * -1;
+    }
+
+    if(box.collision(left)) {
+      reset();
+    }
+
+    if(box.collision(right)) {
+      reset();
+    }
+
+    box.x += xVelocity;
+    box.y += yVelocity;
+  }
+
+  void reset() {
+    box.x = startX;
+    box.y = startY;
   }
 
   void render() {
@@ -197,14 +254,12 @@ int main(int argc, char** argv) {
 
   Ball ball;
   ball.init();
-  ball.box.init(WIDTH/2-BLOCK, HEIGHT/2-BLOCK, BLOCK, BLOCK);
-  // ball.box.bounds.init(0, 0, WIDTH, HEIGHT);
 
   // Bounds
   Box top; top.init(0, TOP, WIDTH, BLOCK);
   Box bottom; bottom.init(0, BOTTOM-BLOCK, WIDTH, BLOCK);
-  Box left; left.init(0, 0, WIDTH, 0);
-  Box right; right.init(WIDTH, 0, HEIGHT, 0);
+  Box left; left.init(0, TOP, 0, HEIGHT);
+  Box right; right.init(WIDTH, TOP, 0, HEIGHT);
 
   while(running) {
     start = SDL_GetTicks();
@@ -260,7 +315,7 @@ int main(int argc, char** argv) {
 
     player.update(top, bottom);
     player2.update(top, bottom);
-    ball.update(player, player2);
+    ball.update(player, player2, top, bottom, left, right);
 
     SDL_GL_SwapBuffers();
 
